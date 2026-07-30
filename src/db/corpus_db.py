@@ -10,7 +10,6 @@ Enables incremental updates and index rebuilding without re-embedding.
 import logging
 import os
 import sqlite3
-import tempfile
 import threading
 from contextlib import contextmanager
 from datetime import datetime

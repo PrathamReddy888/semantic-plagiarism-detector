@@ -6,7 +6,6 @@ import io
 import math
 import os
 import sqlite3
-import tempfile
 from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timezone

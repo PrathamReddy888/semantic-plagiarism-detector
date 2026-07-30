@@ -16,7 +16,6 @@ from src.visualization.network_graph import (
     export_graph_to_csv,
     export_network_to_csv_bytes,
     export_network_to_gexf_bytes,
-    plot_similarity_network,
     render_network_plotly,
 )
 

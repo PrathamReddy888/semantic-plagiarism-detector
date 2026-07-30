@@ -1,20 +1,14 @@
 import asyncio
-import base64
-import hashlib
-import html
 import io as _io
 import logging
 import os
 from pathlib import Path
-import sqlite3
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Any
 
 import numpy as np
 import pandas as pd
-import psutil
 import streamlit as st
 
 # Fix Streamlit import paths by pointing to project root
@@ -29,16 +23,9 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-import base64
-import html
 import json
 
 # Standard / Third-party imports
-import time
-from datetime import datetime
-import numpy as np
-import pandas as pd
-import streamlit as st
 
 from src.security.metadata_stripper import strip_exif_metadata
 from src.utils.filename import (
@@ -52,14 +39,12 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from typing import Any
 
 try:
     from streamlit_plotly_events import plotly_events
 except ImportError:  # pragma: no cover - optional dependency
     plotly_events = None
 
-import logging
 
 
 logger = logging.getLogger(__name__)
@@ -82,117 +67,66 @@ if missing_env_vars:
 # ── Project Core & Utils Imports ──────────────────────────────────────────────
 from app.theme import (
     back_to_top_html,
-    empty_state_html,
     get_colors,
     get_theme_name,
     inject_css,
     set_theme,
-    sidebar_user_badge_html,
     version_check_widget_html,
 )
 from src.core.ai_detector import detect_documents_ai_probability
-from src.core.config import DEFAULT_THRESHOLDS, PLAGIARISM_THRESHOLD, severity_key
+from src.core.config import DEFAULT_THRESHOLDS, PLAGIARISM_THRESHOLD
 from src.core.document_parser import (
     DEFAULT_OCR_DPI,
     DEFAULT_OCR_LANGUAGE,
     SUPPORTED_OCR_LANGUAGES,
-    OCRDependencyError,
     extract_text,
     prepare_text_for_embedding,
-    remove_ignore_phrases,
 )
 from src.core.embedding_model import embed_chunks, embed_documents
-from src.core.export_engine import LMSExportEngine
 from src.core.faiss_index import (
     build_index,
     build_index_from_matrix,
-    find_plagiarised_chunks,
     load_index,
-    load_or_rebuild_index,
     save_index,
     search_similar_chunks,
 )
 from src.core.similarity import (
     cosine_similarity,
     document_similarity_matrix,
-    find_most_similar_chunks,
     flag_plagiarism,
 )
-from src.core.tag_manager import TagManager
-from src.core.telemetry import TelemetryService
 from src.core.text_chunking import chunk_documents
-from src.core.webhook import send_plagiarism_alert
 from src.db import (
     clear_all_data,
     delete_document,
     get_all_documents,
     get_all_embeddings,
     get_chunk_registry,
-    get_documents_by_class,
     get_unique_class_sections,
 )
 from src.db.auth import (
-    add_user,
     authenticate_user,
-    check_login_rate_limit,
-    clear_login_attempts,
-    delete_user,
-    disable_2fa,
-    enable_2fa,
     get_2fa_status,
     get_all_users,
-    get_notification_preferences,
     get_tour_completed,
-    get_upload_count,
     get_user_preferences,
     get_user_role,
-    increment_upload_count,
     init_db,
-    is_upload_rate_limited,
     is_user_active,
-    record_failed_login,
     set_tour_completed,
-    set_user_active_status,
-    update_notification_preferences,
-    update_password,
     update_user_preferences,
-    verify_user,
 )
-from src.db.corpus_db import get_document_tags, init_corpus_db
-from src.db.incidents import (
-    get_all_incidents_above_threshold_for_export,
-    get_high_severity_trends,
-    get_most_plagiarized_documents,
-    sync_flagged_incidents,
-)
+from src.db.corpus_db import init_corpus_db
 from src.i18n.translator import _SUPPORTED_LANGUAGES, get_text
-from src.security.metadata_stripper import strip_exif_metadata
-from src.utils.badge_generator import generate_badge_pdf, generate_badge_png
-from src.utils.diff_highlighter import highlight_overlap
-from src.utils.excel_export import export_similarity_matrix_to_excel
-from src.utils.filename import (
-    InvalidFileExtensionError,
-    sanitize_filename,
-    unique_filename,
-    validate_document_extension,
-)
-from src.utils.json_export import export_similarity_matrix_to_json
-from src.utils.pdf_report import generate_plagiarism_report
 from src.utils.redis_cache import (
-    cache_analysis_results,
-    cache_faiss_index,
     cache_session_state,
     clear_session,
-    get_analysis_results,
-    get_faiss_index,
     get_session_state,
 )
 from src.utils.storage_metrics import calculate_storage_usage
 from src.visualization.heatmap import (
-    plot_chunk_similarity_comparison,
     plot_similarity_heatmap,
 )
-from src.visualization.network_graph import plot_similarity_network
 
 try:
     from src.utils.warning_list import render_warning_controls

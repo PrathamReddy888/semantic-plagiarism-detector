@@ -14,7 +14,7 @@ from app.theme import (
 )
 from unittest.mock import patch
 
-from app.theme import badge_html, get_colors, inject_css, sanitize_hex_color
+from app.theme import get_colors, inject_css, sanitize_hex_color
 
 
 def test_get_colors_returns_valid_theme_colors():
@@ -24,8 +24,6 @@ def test_get_colors_returns_valid_theme_colors():
     assert colors
     assert "background" in colors
     assert "accent" in colors
-from app.theme import (COLORS, severity_tier, tier_color,
-                       tier_from_severity_label)
 
 
 def test_themes_have_expected_keys():
@@ -165,7 +163,6 @@ def test_badge_html_returns_valid_html():
 
 
 import streamlit as st
-from unittest.mock import patch
 from app.theme import initialize_theme, set_theme
 
 def test_initialize_theme_loads_dark_from_query_params():
@@ -281,19 +278,10 @@ def test_set_theme_updates_query_params():
         set_theme("Dark")
     assert mock_query_params["theme"] == "dark"
     assert st.session_state.theme == "Dark"
-from unittest.mock import patch
 
 import matplotlib as mpl
 from app.theme import (
-    COLORS,
     apply_matplotlib_theme,
-    badge_html,
-    get_colors,
-    inject_css,
-    sanitize_hex_color,
-    severity_tier,
-    tier_color,
-    tier_from_severity_label,
 )
 
 
@@ -383,9 +371,6 @@ def test_badge_html_returns_valid_html():
     assert "badge" in html
 
 
-import streamlit as st
-from unittest.mock import patch
-from app.theme import initialize_theme, set_theme
 
 def test_initialize_theme_loads_dark_from_query_params():
     st.session_state.clear()
